@@ -1,0 +1,48 @@
+name: diet-reminder
+
+on:
+  schedule:
+    # 北京时间 = UTC + 8
+    - cron: "15 3 * * *"    # 11:15 午餐
+    - cron: "20 7 * * *"    # 15:20 加餐
+    - cron: "20 9 * * *"    # 17:20 晚餐
+    - cron: "25 10 * * *"   # 18:25 锻炼
+    - cron: "0 12 * * 0"    # 周日 20:00 收下周菜单
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: "lunch / snack / dinner / workout / weekly / auto"
+        default: "auto"
+
+permissions:
+  contents: read
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Resolve slot
+        run: |
+          SLOT="${{ github.event.inputs.slot }}"
+          if [ -z "$SLOT" ] || [ "$SLOT" = "auto" ]; then
+            case "${{ github.event.schedule }}" in
+              "15 3 * * *")  SLOT=lunch ;;
+              "20 7 * * *")  SLOT=snack ;;
+              "20 9 * * *")  SLOT=dinner ;;
+              "25 10 * * *") SLOT=workout ;;
+              "0 12 * * 0")  SLOT=weekly ;;
+              *)             SLOT=auto ;;
+            esac
+          fi
+          echo "SLOT=$SLOT" >> "$GITHUB_ENV"
+
+      - name: Send to WeChat
+        env:
+          SENDKEY: ${{ secrets.SENDKEY }}
+        run: python remind.py --slot "$SLOT"
