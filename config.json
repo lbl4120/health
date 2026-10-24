@@ -1,0 +1,22 @@
+{
+  "profile": {
+    "sex": "male",
+    "age": 45,
+    "height_cm": 176,
+    "start_weight_kg": 86,
+    "target_weight_kg": 81
+  },
+  "targets": {
+    "calories_kcal": 1650,
+    "protein_g": 135,
+    "steps_per_day": 13000
+  },
+  "active_menu": "menus/2026-10-19.json",
+  "reminder": {
+    "lunch": "11:15",
+    "snack": "15:20",
+    "dinner": "17:20",
+    "workout": "18:25",
+    "weekly": "周日 20:00"
+  }
+}
